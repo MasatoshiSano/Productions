@@ -15,7 +15,7 @@
 
 ### 技術的制約
 - Django + Bootstrap 5 + SQLite
-- 外部API・CDN使用禁止
+- 外部API使用禁止
 - フロントエンドフレームワーク使用禁止
 - セキュリティ対策必須（CSRF、XSS、SQLインジェクション）
 
