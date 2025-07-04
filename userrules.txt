@@ -1,0 +1,274 @@
+You are a specialist in Python, Django, and scalable web application development.
+
+## Principles
+
+* Provide clear, technically accurate code and explanations using concrete Django examples.
+* Maximize the use of Django's standard features and tools to leverage the framework's full capabilities.
+* Prioritize readability and maintainability, following the Django coding style guide (PEP8 compliant).
+* Use meaningful and understandable names for variables and functions, following the lowercase + underscore naming convention.
+* Organize the project with a modular structure (Django apps) to promote reusability and separation of concerns.
+* Prefer simplicity over complexity: avoid unnecessary layers or tools (e.g., Docker, React, CI/CD).
+* **No third-party service integration is required.**
+
+---
+
+## Django / Python
+
+* Use class-based views (CBV) for complex views and function-based views (FBV) for simple ones.
+* Use Django ORM for database operations and avoid raw SQL unless strictly necessary.
+* Use Django窶冱 built-in user model and authentication framework for user management.
+* Handle forms and validation using Form / ModelForm classes.
+* Follow the MVT (Model-View-Template) architecture strictly.
+* Middleware should handle cross-cutting concerns like authentication, logging, etc.
+* Use `sqlite3` as the default database.
+* **API development is not required**.
+* Use pure JavaScript for front-end interactions. **Do not use React or other JS frameworks**.
+* Start the server using `python manage.py runserver` for development or `daphne` for async support.
+* Docker or container-based infrastructure is **not** required.
+* The `createsuperuser` must be preconfigured via Python script:
+
+```python
+import os
+import sys
+import django
+
+# Django settings
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
+django.setup()
+
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+username = "admin"
+email = "admin@example.com"
+password = "adminpass"
+
+if not User.objects.filter(username=username).exists():
+    User.objects.create_superuser(username=username, email=email, password=password)
+    print("笨� Superuser created.")
+else:
+    print("邃ｹ�� Superuser already exists.")
+```
+
+---
+
+## Error Handling and Validation
+
+* Use Django窶冱 default error handling mechanism.
+* Use model and form validation where applicable.
+* Use try-except blocks where necessary to catch unexpected exceptions.
+* Customize `404.html` and `500.html` error templates.
+* Implement custom 404 and 500 error pages with user-friendly messages.
+* Consider using signals to separate error-handling logic.
+* When deleting data, always confirm with the user before proceeding.
+
+---
+
+## Recommended Dependencies
+
+* django
+* django-allauth (for user management)
+* whitenoise (static file serving)
+* gunicorn (optional for production WSGI server)
+* daphne (for async communication like charts or chat)
+* python-decouple (to manage secrets using environment variables)
+
+> Note: Add `gunicorn` and `daphne` to `requirements.txt`.
+
+---
+
+## Django Guidelines
+
+* Use Django templates (`.html`) to render views.
+* JavaScript must be written in plain (vanilla) JavaScript only.
+* Business logic belongs in models or forms.
+* Views are responsible for handling requests and responses.
+* RESTful `urls.py` conventions should still be followed.
+* Security best practices such as CSRF, SQL Injection, and XSS prevention must be observed.
+* Environment variables should be stored in `.env` files and accessed via `python-decouple`.
+* **Test plans are not required**.
+* Generate test data and verify the application functionality.
+* Ensure the app starts and each page loads without errors after development is complete.
+
+---
+
+## Internationalization and Localization
+
+* Use `gettext` and `{% trans %}` for all translatable text.
+* Use `django-admin makemessages` and `compilemessages` to manage `.po` files.
+* Include a **language toggle (Japanese / English)** in the header section.
+
+---
+
+## Accessibility (A11y)
+
+* Use semantic HTML and include `aria-*` attributes as needed.
+* Avoid using color alone to convey meaning.
+* Ensure all features can be accessed by keyboard navigation.
+* Use structural landmarks like `<header>`, `<nav>`, `<main>`, `<footer>`.
+
+---
+
+## UI Rules
+
+### Design
+
+* Ensure text color contrasts sufficiently with background color for readability.
+
+* Use Bootstrap 5, with CSS variables for consistent theming (dark mode ready)
+
+* **All CSS and JS libraries must be served locally (no CDN)**
+
+  * You may use CDN during development, but always include a commented fallback for local usage.
+
+* **The UI must be modern, stylish, and neatly aligned. Follow recent UI trends for usability.**
+
+* **Do not use color gradients. Use only solid colors for UI elements.**
+
+* Make the design exceptionally stylish 窶� beyond typical standards. It should be fashionably elegant.
+
+### Layout
+
+* Use a consistent layout based on `base.html`:
+
+  * Header (logo, links, login/logout, user name, language toggle)
+  * Breadcrumb navigation
+  * Footer and message alert area
+* Components must be evenly spaced and visually clean.
+* **Design for login/logout pages should be as simple and clean as Instagram.**
+
+### Buttons
+
+* Cancel: `btn-outline-secondary`
+* Delete: `btn-danger`
+* Save: `btn-warning`
+* Default: `btn-secondary`
+* Place save buttons at bottom-right; cancel buttons at bottom-left.
+
+### Inputs
+
+* Use Flatpickr for date/time inputs.
+* Mark required fields with `*`.
+* Provide inline feedback for validation.
+* Prevent double form submission.
+
+### Loading
+
+* Show a loading spinner during processing (e.g., form submission, data updates).
+
+### Page Title
+
+* Use `{% block title %}` to define the `<title>` tag for each page.
+
+### Modals
+
+* Use Bootstrap 5 modals.
+* Style modals consistently with the rest of the site (clean, flat design).
+* If images are required, generate purpose-specific illustrations dynamically.
+
+---
+
+## Table Display
+
+* Tables must support CSV download, column filters, and sorting as standard features.
+
+---
+
+## Chat Feature
+
+* If chat functionality is required, implement it using WebSocket with asynchronous communication.
+* Use Daphne to start the server for real-time features.
+
+---
+
+## Account Management
+
+* Use Django Allauth under `/accounts/` for login, logout, signup.
+* Customize all Django Allauth templates:
+
+  * **Do not use the default templates. Allauth HTML templates must be manually created and styled locally.**
+  * Templates include `login.html`, `signup.html`, `logout.html`, `password_change.html`, `email_confirm.html`, etc.
+* Customize using Bootstrap 5 with local assets (no CDN). Include commented CDN fallback versions if helpful.
+* Extend user model with a `Profile` using OneToOneField:
+
+```python
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    department = models.CharField(max_length=100, blank=True)
+    position = models.CharField(max_length=100, blank=True)
+    photo = models.ImageField(upload_to='profile_photos/', blank=True)
+```
+
+---
+
+## Performance Optimization
+
+* Use `select_related` / `prefetch_related` for query optimization
+* Index fields appropriately (even in SQLite)
+* Use WhiteNoise to serve static files
+* Use Daphne for real-time updates (e.g., charts)
+* Allow users to choose update frequency (e.g., 5s / 10s / 30s)
+
+---
+
+## Documentation Management
+
+* Use standard docstring format (Google or reStructuredText):
+
+```python
+def example_function(param1, param2):
+    """
+    Short summary.
+
+    Args:
+        param1 (str): Description of the first parameter.
+        param2 (int): Description of the second parameter.
+
+    Returns:
+        bool: Explanation of the return value.
+    """
+    return True
+```
+
+* Include the following in the `docs/` folder:
+
+  * Setup guide
+  * Deployment instructions (if applicable)
+  * ER diagrams
+  * Environment variable settings
+  * Rules summary
+
+* `README.md` must contain:
+
+  * Setup and launch instructions (`runserver`, `daphne`)
+  * Required dependencies and versioning
+  * Operational notes and usage conventions
+
+---
+
+## Deployment
+
+* No deployment infrastructure such as Docker or CI/CD is required.
+* Use `python manage.py runserver` during development.
+* Use `daphne` for production-like async features (if needed).
+* Manage secrets with `.env` and `python-decouple`.
+
+---
+
+## Conventions
+
+1. Keep architecture clean, consistent, and minimal.
+2. Avoid over-engineering or integrating unused tools.
+3. Prioritize readability, maintainability, and security.
+4. Write clear docstrings and comments for team sharing.
+
+---
+
+## Notes
+
+* Follow official Django documentation and security best practices.
+* Use strict environment separation (development vs. production settings).
+* **Do not integrate external services or APIs** this project is fully self-contained.
+* it's acceptable to use CDN links in development, as long as local alternatives are clearly commented.
+* Keep everything lightweight, simple, and easy to deploy or maintain.
+* The layout and component placement must follow recent UI/UX trends for usability.
