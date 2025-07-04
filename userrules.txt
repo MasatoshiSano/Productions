@@ -117,8 +117,6 @@ else:
 
 * Use Bootstrap 5, with CSS variables for consistent theming (dark mode ready)
 
-* **All CSS and JS libraries must be served locally (no CDN)**
-
   * You may use CDN during development, but always include a commented fallback for local usage.
 
 * **The UI must be modern, stylish, and neatly aligned. Follow recent UI trends for usability.**
@@ -188,7 +186,6 @@ else:
 
   * **Do not use the default templates. Allauth HTML templates must be manually created and styled locally.**
   * Templates include `login.html`, `signup.html`, `logout.html`, `password_change.html`, `email_confirm.html`, etc.
-* Customize using Bootstrap 5 with local assets (no CDN). Include commented CDN fallback versions if helpful.
 * Extend user model with a `Profile` using OneToOneField:
 
 ```python
