@@ -7,12 +7,26 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
 
 ## 🎯 確定済み仕様
 
-### 技術仕様
-- **位置情報**: 郵便番号ベースでの距離計算（50km以内）
+### 技術仕様（最新版）
+- **Python**: 3.12 (最新版)
+- **Django**: 5.0 (最新版)
+- **データベース**: PostgreSQL 16 (最新版)
+- **Redis**: 7.x (最新版)
+- **位置情報**: 郵便番号API（HeartRails Geo API等）による距離計算（50km以内）
 - **年齢認証**: 生年月日入力による自己申告
-- **画像処理**: 800x800px、最大5MB、JPEG/PNG対応
+- **画像処理**: 800x800px、最大5MB、JPEG/PNG対応、ローカルストレージ
+- **メール送信**: SendGrid SMTP
 - **リアルタイム通信**: Redis + Django Channels
+- **デプロイ**: Docker対応
 - **デザイン**: PC・モバイル両対応、マッチングサイト適応カラー
+
+### セキュリティ・レート制限
+- **HTTPS**: 開発環境では不要
+- **レート制限**: 
+  - メッセージ送信: 1分間に10件まで
+  - いいね送信: 1日100件まで
+  - 登録試行: 1IPから1時間に5回まで
+- **CSP**: 基本的なContent Security Policy設定
 
 ### プロフィール項目
 - **必須項目**: 名前、年齢、性別、都道府県、郵便番号、プロフィール写真
@@ -23,9 +37,14 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
 - **距離**: 50km以内（郵便番号ベース）
 
 ### 通知機能
-- **メール通知**: 即座送信
+- **メール通知**: 即座送信（SendGrid）
 - **ブラウザ通知**: 即座表示
 - **通知内容**: マッチング成立、メッセージ受信
+
+### 運用・保守
+- **データ保持**: 退会ユーザーのデータは即時削除
+- **ヘルプ・FAQ**: ユーザーサポートページを含む
+- **統計機能**: 基本的な利用統計（ユーザー数、マッチング数等）
 
 ## ✅ タスクリスト
 
@@ -37,12 +56,27 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
   - [ ] Django プロジェクト作成 (`matching_site`)
   - [ ] アプリケーション作成 (`accounts`, `matching`, `messaging`, `core`)
   - [ ] `settings.py` 設定完了（Bootstrap 5, Redis, Channels, 静的ファイル設定）
-  - [ ] `requirements.txt` 作成完了（Django, Channels, Redis, Pillow, requests含む）
+  - [ ] `requirements.txt` 作成完了（下記参照）
+  - [ ] `Dockerfile` および `docker-compose.yml` 作成
 - 動作確認:
   - [ ] `python manage.py runserver` で起動確認
   - [ ] Bootstrap 5 の読み込み確認
   - [ ] Redis接続確認
-- メモ: 郵便番号から座標変換用のAPIライブラリも含める
+- メモ: 郵便番号API（HeartRails Geo API）設定も含める
+
+**requirements.txt 内容:**
+```
+Django==5.0.*
+channels==4.0.*
+channels-redis==4.2.*
+redis==5.0.*
+Pillow==10.0.*
+requests==2.31.*
+sendgrid==6.10.*
+django-ratelimit==4.1.*
+psycopg2-binary==2.9.*
+python-decouple==3.8
+```
 
 #### 2. **カスタムUserモデルの作成**
 - 概要: AbstractUserを継承したカスタムUserモデルを作成
@@ -114,7 +148,7 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
 #### 7. **郵便番号から座標変換機能の実装**
 - 概要: 郵便番号から緯度経度を取得し、距離計算を可能にする
 - 完了条件:
-  - [ ] 郵便番号マスターデータまたはAPIの実装
+  - [ ] HeartRails Geo API連携実装
   - [ ] 距離計算機能実装（50km以内検索）
   - [ ] `core/utils.py` に距離計算関数作成
   - [ ] プロフィール保存時に座標自動取得
@@ -122,7 +156,9 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
   - [ ] 郵便番号入力で座標取得確認
   - [ ] 距離計算の精度確認
   - [ ] 50km以内ユーザー検索確認
-- メモ: 無料の郵便番号APIまたはCSVデータを使用
+- メモ: HeartRails Geo API（無料）を使用
+  - API URL: `https://geoapi.heartrails.com/api/json?method=searchByPostal&postal={郵便番号}`
+  - レスポンス: `{"response": {"location": [{"x": "経度", "y": "緯度"}]}}`
 
 #### 8. **プロフィール作成・編集フォームの実装**
 - 概要: プロフィール作成・編集用のフォームクラス作成
@@ -261,13 +297,24 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
 - 概要: メール・ブラウザ通知機能
 - 完了条件:
   - [ ] `core/notification.py` に通知システム作成
+  - [ ] SendGrid設定完了
   - [ ] マッチング成立時の即座メール送信
   - [ ] メッセージ受信時の即座メール送信
   - [ ] ブラウザ通知API実装
+  - [ ] レート制限実装（1分間10件、1日100件）
 - 動作確認:
   - [ ] 各種通知機能確認
   - [ ] 通知タイミング確認
-- メモ: 通知の重複送信防止機能
+  - [ ] レート制限確認
+- メモ: 通知の重複送信防止機能、SendGrid API Key設定
+
+**SendGrid設定:**
+```python
+# settings.py
+EMAIL_BACKEND = 'sendgrid_backend.SendgridBackend'
+SENDGRID_API_KEY = os.environ.get('SENDGRID_API_KEY')
+DEFAULT_FROM_EMAIL = 'noreply@matchingsite.com'
+```
 
 #### 19. **ブロック・報告機能の実装**
 - 概要: ユーザーブロック・不適切ユーザー報告機能
@@ -322,7 +369,20 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
   - [ ] データベースクエリ数確認
 - メモ: Django Debug Toolbarで確認
 
-#### 23. **統合テスト・E2Eテスト**
+#### 23. **ヘルプ・FAQページの実装**
+- 概要: ユーザーサポートページの作成
+- 完了条件:
+  - [ ] `core/views.py` にヘルプ・FAQビュー作成
+  - [ ] よくある質問の整理・作成
+  - [ ] 使い方ガイドの作成
+  - [ ] 問い合わせフォームの実装
+- 動作確認:
+  - [ ] `/help/` でヘルプページ表示確認
+  - [ ] `/faq/` でFAQページ表示確認
+  - [ ] 問い合わせフォーム動作確認
+- メモ: 利用規約・プライバシーポリシーも含める
+
+#### 24. **統合テスト・E2Eテスト**
 - 概要: 全機能の統合テストとエンドツーエンドテスト
 - 完了条件:
   - [ ] 全機能統合テスト作成
@@ -344,9 +404,9 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
 - [ ] フェーズ3: マッチング機能 (0/4)
 - [ ] フェーズ4: メッセージング機能 (0/4)
 - [ ] フェーズ5: 通知・管理機能 (0/3)
-- [ ] フェーズ6: UI/UX仕上げ (0/3)
+- [ ] フェーズ6: UI/UX仕上げ (0/4)
 
-### 全体進捗: 0/23 タスク完了
+### 全体進捗: 0/24 タスク完了
 
 ### 実装順序の依存関係
 ```
@@ -359,7 +419,76 @@ Django + Bootstrap 5を使用したマッチングサイトアプリケーショ
 
 ---
 
-## 🔗 関連ドキュメント
+## � **実装準備情報**
+
+### 環境変数設定（.env ファイル）
+```env
+# Database
+DATABASE_URL=postgresql://user:password@localhost:5432/matching_site
+POSTGRES_DB=matching_site
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+
+# Django
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+ALLOWED_HOSTS=localhost,127.0.0.1
+
+# Redis
+REDIS_URL=redis://localhost:6379/0
+
+# SendGrid
+SENDGRID_API_KEY=your-sendgrid-api-key
+
+# Media Files
+MEDIA_ROOT=/app/media/
+MEDIA_URL=/media/
+
+# Security
+CSRF_COOKIE_SECURE=False
+SESSION_COOKIE_SECURE=False
+```
+
+### Docker設定（docker-compose.yml）
+```yaml
+version: '3.8'
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: matching_site
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    ports:
+      - "5432:5432"
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  web:
+    build: .
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_URL=postgresql://user:password@db:5432/matching_site
+      - REDIS_URL=redis://redis:6379/0
+    volumes:
+      - ./media:/app/media
+
+volumes:
+  postgres_data:
+```
+
+---
+
+## �🔗 関連ドキュメント
 
 - 実装要件: [specification.md](./specification.md)
 - 設計方針: [design-doc.md](../../../design-doc.md)
