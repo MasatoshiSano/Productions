@@ -1,0 +1,12 @@
+# Core Django packages
+Django==4.2.7
+
+# Future packages (to be installed in later phases)
+# channels==4.0.0
+# channels-redis==4.1.0
+# redis==5.0.1
+# Pillow==10.1.0
+# requests==2.31.0
+# python-dotenv==1.0.0
+# psycopg2-binary==2.9.9
+# django-bootstrap5==23.3

@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block title %}ホーム - マッチングサイト{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="text-center mb-5">
+            <h1 class="display-4">
+                <i class="bi bi-heart-fill text-danger"></i>
+                マッチングサイトへようこそ
+            </h1>
+            <p class="lead">素敵な出会いを見つけましょう</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-person-plus-fill text-primary mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">会員登録</h5>
+                        <p class="card-text">プロフィールを作成して、素敵な出会いを始めましょう。</p>
+                        <a href="#" class="btn btn-primary">登録する</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-search-heart text-success mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">相手を探す</h5>
+                        <p class="card-text">条件に合った相手を見つけて、マッチングを楽しみましょう。</p>
+                        <a href="#" class="btn btn-success">探す</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <i class="bi bi-chat-heart text-info mb-3" style="font-size: 2rem;"></i>
+                        <h5 class="card-title">メッセージ</h5>
+                        <p class="card-text">マッチした相手とメッセージを交換しましょう。</p>
+                        <a href="#" class="btn btn-info">メッセージ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">開発状況</h5>
+                        <p class="card-text">
+                            現在、フェーズ1「プロジェクトセットアップとユーザー認証」を実装中です。
+                        </p>
+                        <ul class="list-unstyled">
+                            <li>✅ Djangoプロジェクト初期セットアップ</li>
+                            <li>⏳ カスタムUserモデルの作成</li>
+                            <li>⏳ ユーザー登録機能の実装</li>
+                            <li>⏳ ログイン・ログアウト機能の実装</li>
+                            <li>⏳ 認証機能のテスト作成</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
